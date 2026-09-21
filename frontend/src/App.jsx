@@ -1,3 +1,58 @@
+HEAD
+import React from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import Notes from './Notes';
+import PrivateNotes from './PrivateNotes';
+import Settings from './Settings';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
+        
+        {/* --- SIDEBAR: THANH ĐIỀU HƯỚNG BÊN TRÁI --- */}
+        <nav style={{ 
+          width: '240px', 
+          backgroundColor: '#f8f9fa', 
+          padding: '20px', 
+          borderRight: '1px solid #dee2e6' 
+        }}>
+          <h3 style={{ marginTop: 0, color: '#333' }}>Quản Lý Ghi Chú</h3>
+          <ul style={{ listStyle: 'none', padding: 0, lineHeight: '2' }}>
+            <li>
+              <Link to="/" style={{ textDecoration: 'none', color: '#007bff', fontWeight: 'bold' }}>
+                📝 Ghi chú công khai
+              </Link>
+            </li>
+            <li>
+              <Link to="/private" style={{ textDecoration: 'none', color: '#dc3545', fontWeight: 'bold' }}>
+                🔒 Vùng kín (Bảo mật)
+              </Link>
+            </li>
+            <li>
+              <Link to="/settings" style={{ textDecoration: 'none', color: '#28a745', fontWeight: 'bold' }}>
+                ⚙️ Cài đặt hệ thống
+              </Link>
+            </li>
+          </ul>
+        </nav>
+
+        {/* --- MAIN CONTENT: VÙNG HIỂN THỊ NỘI DUNG THAY ĐỔI THEO ROUTE --- */}
+        <main style={{ flex: 1, backgroundColor: '#fff' }}>
+          <Routes>
+            <Route path="/" element={<Notes />} />
+            <Route path="/private" element={<PrivateNotes />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </main>
+
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+
 import { useState } from 'react'
 import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
@@ -120,3 +175,4 @@ function App() {
 }
 
 export default App
+
