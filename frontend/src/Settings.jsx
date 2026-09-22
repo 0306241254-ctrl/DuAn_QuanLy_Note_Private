@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
 
-function Settings({ theme, setTheme }) {
+function Settings({ theme = 'light', setTheme }) {
   const [displayName, setDisplayName] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+
+  const isDark = theme === 'dark';
 
   // Lấy dữ liệu profile từ Backend khi load trang
   useEffect(() => {
@@ -12,19 +13,19 @@ function Settings({ theme, setTheme }) {
       .then(res => res.json())
       .then(data => {
         if (data.displayName) setDisplayName(data.displayName);
-        if (data.theme) setTheme(data.theme);
+        if (data.theme && setTheme) setTheme(data.theme);
       })
       .catch(err => console.error('Lỗi tải profile:', err));
   }, [setTheme]);
 
   // Xử lý đổi theme
   const handleThemeChange = (e) => {
-    setTheme(e.target.value);
+    const selectedTheme = e.target.value;
+    if (setTheme) setTheme(selectedTheme);
   };
 
   // Xử lý lưu thay đổi
   const handleSave = () => {
-    // Nếu nhập mật khẩu mới mà bỏ trống mật khẩu hiện tại
     if (newPassword && !currentPassword) {
       alert("Vui lòng nhập mật khẩu hiện tại để xác nhận đổi mật khẩu!");
       return;
@@ -45,86 +46,95 @@ function Settings({ theme, setTheme }) {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          alert(data.message);
-          // Reset lại các ô mật khẩu sau khi lưu thành công
+          alert(data.message || "Lưu cài đặt thành công!");
           setCurrentPassword('');
           setNewPassword('');
         } else {
-          alert(data.message); // Hiển thị thông báo nếu sai mật khẩu hiện tại
+          alert(data.message || "Lưu cài đặt thất bại!");
         }
       })
       .catch(err => console.error('Lỗi lưu profile:', err));
   };
 
-  const isDark = theme === 'dark';
+  const inputStyle = {
+    width: '100%',
+    padding: '8px',
+    boxSizing: 'border-box',
+    borderRadius: '4px',
+    border: isDark ? '1px solid #555' : '1px solid #ccc',
+    backgroundColor: isDark ? '#333' : '#fff',
+    color: isDark ? '#fff' : '#000',
+    marginTop: '5px'
+  };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '500px' }}>
-      <h2>Cài đặt hệ thống</h2>
+    <div style={{ padding: '10px' }}>
+      <h2 style={{ marginTop: 0 }}>⚙️ Cài đặt hệ thống</h2>
 
+      {/* Tên hiển thị */}
       <div style={{ marginTop: '15px' }}>
-        <label style={{ display: 'block', marginBottom: '5px' }}>Tên hiển thị: </label>
+        <label style={{ fontWeight: 'bold' }}>Tên hiển thị: </label>
         <input 
           type="text"
           value={displayName} 
           onChange={(e) => setDisplayName(e.target.value)} 
-          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+          style={inputStyle}
+          placeholder="Nhập tên hiển thị..."
         />
       </div>
 
+      {/* Giao diện */}
       <div style={{ marginTop: '15px' }}>
-        <label style={{ display: 'block', marginBottom: '5px' }}>Giao diện: </label>
+        <label style={{ fontWeight: 'bold' }}>Giao diện: </label>
         <select 
           value={theme} 
           onChange={handleThemeChange}
-          style={{ 
-            width: '100%',
-            padding: '8px', 
-            borderRadius: '4px',
-            backgroundColor: isDark ? '#333' : '#fff',
-            color: isDark ? '#fff' : '#000',
-            border: '1px solid #ccc'
-          }}
+          style={inputStyle}
         >
-          <option value="light">Sáng</option>
-          <option value="dark">Tối</option>
+          <option value="light">☀️ Sáng (Light)</option>
+          <option value="dark">🌙 Tối (Dark)</option>
         </select>
       </div>
 
-      <hr style={{ margin: '20px 0', borderColor: isDark ? '#444' : '#ccc' }} />
-      <h3>Đổi mật khẩu riêng tư</h3>
+      <hr style={{ margin: '20px 0', borderColor: isDark ? '#444' : '#eee' }} />
+
+      {/* Đổi mật khẩu */}
+      <h3 style={{ marginTop: 0 }}>🔑 Đổi mật khẩu riêng tư</h3>
 
       <div style={{ marginTop: '10px' }}>
-        <label style={{ display: 'block', marginBottom: '5px' }}>Mật khẩu hiện tại: </label>
+        <label style={{ fontSize: '14px' }}>Mật khẩu hiện tại: </label>
         <input 
           type="password" 
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)} 
-          placeholder="Nhập mật khẩu cũ nếu muốn đổi"
-          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+          placeholder="Nhập mật khẩu cũ nếu muốn đổi..."
+          style={inputStyle}
         />
       </div>
 
       <div style={{ marginTop: '10px' }}>
-        <label style={{ display: 'block', marginBottom: '5px' }}>Mật khẩu mới: </label>
+        <label style={{ fontSize: '14px' }}>Mật khẩu mới: </label>
         <input 
           type="password" 
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)} 
-          placeholder="Nhập mật khẩu mới"
-          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+          placeholder="Nhập mật khẩu mới..."
+          style={inputStyle}
         />
       </div>
 
+      {/* Nút lưu */}
       <button 
         onClick={handleSave} 
         style={{ 
           marginTop: '20px', 
+          width: '100%',
           padding: '10px 20px', 
           backgroundColor: '#28a745', 
           color: '#fff', 
           border: 'none', 
           borderRadius: '4px',
+          fontWeight: 'bold',
           cursor: 'pointer' 
         }}
       >
@@ -134,66 +144,4 @@ function Settings({ theme, setTheme }) {
   );
 }
 
-=======
-function Settings() {
-const [profile, setProfile] = useState({ displayName: '', theme: 'light', password:
-'' });
-// Lấy dữ liệu khi vừa load trang
-useEffect(() => {
-fetch('http://localhost:5000/api/profile')
-.then(res => res.json())
-.then(data => {
-setProfile(data);
-// Đổi màu nền tạm thời dựa theo theme
-document.body.style.backgroundColor = data.theme === 'dark' ? '#333' :
-'#fff';
-document.body.style.color = data.theme === 'dark' ? '#fff' : '#000';
-});
-}, []);
-// Hàm xử lý khi gõ vào Input
-const handleChange = (e) => {
-setProfile({ ...profile, [e.target.name]: e.target.value });
-};
-// Hàm xử lý Lưu thay đổi
-const handleSave = () => {
-fetch('http://localhost:5000/api/profile', {
-method: 'PUT',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify(profile)
-})
-.then(res => res.json())
-.then(data => {
-alert("Lưu thành công!");
-// Áp dụng màu nền ngay lập tức
-document.body.style.backgroundColor = profile.theme === 'dark' ? '#333' :
-'#fff';
-document.body.style.color = profile.theme === 'dark' ? '#fff' : '#000';
-});
-};
-return (
-<div style={{ padding: '20px' }}>
-<h2>Cài đặt hệ thống</h2>
-<div>
-    <label>Tên hiển thị: </label>
-<input name="displayName" value={profile.displayName} onChange={handleChange}
-/>
-</div>
-<div style={{ marginTop: '10px' }}>
-<label>Giao diện: </label>
-<select name="theme" value={profile.theme} onChange={handleChange}>
-<option value="light">Sáng</option>
-<option value="dark">Tối</option>
-</select>
-</div>
-<div style={{ marginTop: '10px' }}>
-<label>Mật khẩu vùng kín: </label>
-<input type="password" name="password" value={profile.password}
-onChange={handleChange} />
-</div>
-<button onClick={handleSave} style={{ marginTop: '20px' }}>Lưu thay
-đổi</button>
-</div>
-);
-}
->>>>>>> 2a5839d8b31963dffe0f8ef77006bbcecddfc19d
 export default Settings;

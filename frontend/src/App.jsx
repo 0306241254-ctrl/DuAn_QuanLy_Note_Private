@@ -12,6 +12,8 @@ function App() {
 
   useEffect(() => {
     localStorage.setItem('app_theme', theme);
+    // Cập nhật màu nền màn hình ngoài theo Dark/Light mode
+    document.body.style.backgroundColor = theme === 'dark' ? '#111827' : '#e5e7eb';
   }, [theme]);
 
   const navItemStyle = ({ isActive }) => ({
@@ -33,8 +35,9 @@ function App() {
         justifyContent: 'center', 
         alignItems: 'center', 
         minHeight: '100vh', 
-        backgroundColor: '#e5e7eb',
-        fontFamily: "'Segoe UI', Roboto, Helvetica, sans-serif"
+        backgroundColor: theme === 'dark' ? '#111827' : '#e5e7eb',
+        fontFamily: "'Segoe UI', Roboto, Helvetica, sans-serif",
+        transition: 'background-color 0.3s ease'
       }}>
         
         {/* KHUNG ĐIỆN THOẠI */}
@@ -46,9 +49,10 @@ function App() {
           backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff', 
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          borderRadius: '12px'
         }}>
           
           {/* Header Bar */}
@@ -83,21 +87,21 @@ function App() {
           <div style={{ 
             display: 'flex', 
             backgroundColor: theme === 'dark' ? '#111827' : '#ffffff', 
-            borderTop: '1px solid #e5e7eb',
+            borderTop: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb',
             boxShadow: '0 -2px 10px rgba(0,0,0,0.03)'
           }}>
             <NavLink to="/" style={navItemStyle}>
-              <span style={{ fontSize: '24px', marginBottom: '4px' }}>📓</span>
+              <span style={{ fontSize: '22px', marginBottom: '2px' }}>📓</span>
               <span style={{ fontSize: '11px', fontWeight: '700' }}>Ghi chú</span>
             </NavLink>
             
             <NavLink to="/private" style={navItemStyle}>
-              <span style={{ fontSize: '24px', marginBottom: '4px' }}>🔒</span>
+              <span style={{ fontSize: '22px', marginBottom: '2px' }}>🔒</span>
               <span style={{ fontSize: '11px', fontWeight: '700' }}>Riêng tư</span>
             </NavLink>
             
             <NavLink to="/settings" style={navItemStyle}>
-              <span style={{ fontSize: '24px', marginBottom: '4px' }}>⚙️</span>
+              <span style={{ fontSize: '22px', marginBottom: '2px' }}>⚙️</span>
               <span style={{ fontSize: '11px', fontWeight: '700' }}>Cài đặt</span>
             </NavLink>
           </div>
