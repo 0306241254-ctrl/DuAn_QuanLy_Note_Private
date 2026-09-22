@@ -10,15 +10,14 @@
 - **Backend:** Node.js, Express.js.
 - **Cơ sở dữ liệu:** File System (lưu trữ bằng định dạng `.json` để dễ quản lý và
 triển khai).
-<<<<<<< HEAD
 ## 2. Yêu cầu môi trường
 - Máy tính cần cài đặt sẵn **Node.js** (phiên bản v16 trở lên).
 ## 3. Hướng dẫn Cài đặt & Chạy dự án (Rất quan trọng)
 Dự án được chia làm 2 phần chạy độc lập. Vui lòng mở 2 cửa sổ Terminal (Command
 Prompt) để chạy song song.
-### Bước 1: Khởi động Backend (Máy chủ API)
-Mở Terminal 1, di chuyển vào thư mục `backend` và chạy lệnh:
 ```bash
+Bước 1: Khởi động Backend (Máy chủ API)
+Mở Terminal 1, di chuyển vào thư mục `backend` và chạy lệnh:
 cd backend
 npm install
 node server.js
@@ -36,6 +35,4 @@ hệ thống.
 Web không yêu cầu đăng nhập tài khoản.
 Để xem khu vực Ghi chú riêng tư, vui lòng vào menu "Cài đặt" để tạo mật khẩu mới.
 ---
-=======
-## 2. Yêu cầu môi trường
->>>>>>> 2a5839d8b31963dffe0f8ef77006bbcecddfc19d
+
