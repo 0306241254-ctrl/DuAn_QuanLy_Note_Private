@@ -32,7 +32,10 @@ function initDefaultData() {
     if (!fs.existsSync(profilePath)) {
         const defaultProfile = {
             displayName: "Anh Vũ",
+<<<<<<< HEAD
             theme: "dark",
+=======
+>>>>>>> 2a5839d8b31963dffe0f8ef77006bbcecddfc19d
             preferences: {
                 theme: "dark",
                 primaryColor: "#ff5722"
@@ -96,12 +99,16 @@ initDefaultData();
 app.get('/api/profile', (req, res) => {
     try {
         const rawData = fs.readFileSync(profilePath, 'utf8');
+<<<<<<< HEAD
         const profile = JSON.parse(rawData);
         
         if (!profile.theme && profile.preferences?.theme) {
             profile.theme = profile.preferences.theme;
         }
         res.json(profile);
+=======
+        res.json(JSON.parse(rawData));
+>>>>>>> 2a5839d8b31963dffe0f8ef77006bbcecddfc19d
     } catch (error) {
         res.status(500).json({ message: "Lỗi đọc file profile" });
     }
@@ -109,6 +116,7 @@ app.get('/api/profile', (req, res) => {
 
 app.put('/api/profile', (req, res) => {
     try {
+<<<<<<< HEAD
         let currentProfile = {};
         if (fs.existsSync(profilePath)) {
             currentProfile = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
@@ -145,6 +153,10 @@ app.put('/api/profile', (req, res) => {
         fs.writeFileSync(profilePath, JSON.stringify(currentProfile, null, 2), 'utf8');
         
         res.json({ success: true, message: "Đã cập nhật Profile thành công!", profile: currentProfile });
+=======
+        fs.writeFileSync(profilePath, JSON.stringify(req.body, null, 2), 'utf8');
+        res.json({ success: true, message: "Đã cập nhật Profile" });
+>>>>>>> 2a5839d8b31963dffe0f8ef77006bbcecddfc19d
     } catch (error) {
         res.status(500).json({ message: "Lỗi ghi file profile" });
     }
@@ -153,6 +165,7 @@ app.put('/api/profile', (req, res) => {
 // ============================================================================
 // API MODULE: PRIVATE NOTES
 // ============================================================================
+<<<<<<< HEAD
 // POST /api/private/auth
 app.post('/api/private/auth', (req, res) => {
     try {
@@ -162,12 +175,22 @@ app.post('/api/private/auth', (req, res) => {
         const savedPass = String(profile.password || '').trim();
 
         if (inputPass !== '' && inputPass === savedPass) {
+=======
+app.post('/api/private/auth', (req, res) => {
+    try {
+        const profile = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
+        if (profile.password && profile.password === req.body.password) {
+>>>>>>> 2a5839d8b31963dffe0f8ef77006bbcecddfc19d
             res.json({ success: true });
         } else {
             res.status(401).json({ success: false, message: "Sai mật khẩu!" });
         }
     } catch (error) {
+<<<<<<< HEAD
         res.status(500).json({ message: "Lỗi xác thực mật khẩu" });
+=======
+        res.status(500).json({ message: "Lỗi hệ thống xác thực" });
+>>>>>>> 2a5839d8b31963dffe0f8ef77006bbcecddfc19d
     }
 });
 
@@ -291,6 +314,7 @@ app.delete('/api/notes/:topic/:id', (req, res) => {
     }
 });
 
+<<<<<<< HEAD
 // Route trả về danh sách danh mục chủ đề
 app.get('/api/categories', (req, res) => {
     const categories = [
@@ -301,6 +325,8 @@ app.get('/api/categories', (req, res) => {
     res.json(categories);
 });
 
+=======
+>>>>>>> 2a5839d8b31963dffe0f8ef77006bbcecddfc19d
 // ============================================================================
 // CHẠY SERVER
 // ============================================================================

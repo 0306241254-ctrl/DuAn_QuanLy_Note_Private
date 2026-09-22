@@ -49,7 +49,10 @@ fetch(`http://localhost:5000/api/notes/${topic}/${id}`, { method: 'DELETE' })
 };
 const handleEdit = (note) => setFormData({ id: note.id, title: note.title, content:
 note.content });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2a5839d8b31963dffe0f8ef77006bbcecddfc19d
 /* ========================================================================
 VÙNG 3: RENDER GIAO DIỆN (UI/CSS)
 ======================================================================== */

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+
 import Notes from './Notes';
 import PrivateNotes from './PrivateNotes';
 import Settings from './Settings';
@@ -9,68 +10,101 @@ function App() {
     return localStorage.getItem('app_theme') || 'light';
   });
 
-  // Cập nhật màu cho toàn bộ body
   useEffect(() => {
     localStorage.setItem('app_theme', theme);
-    const isDark = theme === 'dark';
-    
-    document.body.style.backgroundColor = isDark ? '#1e1e1e' : '#ffffff';
-    document.body.style.color = isDark ? '#ffffff' : '#000000';
   }, [theme]);
 
-  const isDark = theme === 'dark';
+  const navItemStyle = ({ isActive }) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px 0',
+    flex: 1,
+    textDecoration: 'none',
+    color: isActive ? '#3b82f6' : '#9ca3af',
+    transition: 'color 0.2s ease',
+  });
 
   return (
-    <BrowserRouter>
-      <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
+    <Router>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh', 
+        backgroundColor: '#e5e7eb',
+        fontFamily: "'Segoe UI', Roboto, Helvetica, sans-serif"
+      }}>
         
-        {/* --- SIDEBAR: THANH ĐIỀU HƯỚNG BÊN TRÁI --- */}
-        <nav style={{ 
-          width: '240px', 
-          backgroundColor: isDark ? '#252526' : '#f8f9fa',
-          padding: '20px', 
-          borderRight: isDark ? '1px solid #3c3c3c' : '1px solid #dee2e6' 
+        {/* KHUNG ĐIỆN THOẠI */}
+        <div style={{ 
+          width: '100%', 
+          maxWidth: '414px', 
+          height: '100vh', 
+          maxHeight: '850px', 
+          backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff', 
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+          position: 'relative',
+          overflow: 'hidden'
         }}>
-          {/* Đổi màu chữ tiêu đề theo theme */}
-          <h3 style={{ marginTop: 0, color: isDark ? '#ffffff' : '#333333' }}>
-            Quản Lý Ghi Chú
-          </h3>
-          <ul style={{ listStyle: 'none', padding: 0, lineHeight: '2' }}>
-            <li>
-              <Link to="/" style={{ textDecoration: 'none', color: '#007bff', fontWeight: 'bold' }}>
-                📝 Ghi chú công khai
-              </Link>
-            </li>
-            <li>
-              <Link to="/private" style={{ textDecoration: 'none', color: '#dc3545', fontWeight: 'bold' }}>
-                🔒 Riêng tư (Bảo mật)
-              </Link>
-            </li>
-            <li>
-              <Link to="/settings" style={{ textDecoration: 'none', color: '#28a745', fontWeight: 'bold' }}>
-                ⚙️ Cài đặt hệ thống
-              </Link>
-            </li>
-          </ul>
-        </nav>
+          
+          {/* Header Bar */}
+          <div style={{ 
+            backgroundColor: theme === 'dark' ? '#111827' : '#ffffff', 
+            padding: '16px 20px', 
+            textAlign: 'center', 
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+            zIndex: 10 
+          }}>
+            <h2 style={{ margin: 0, color: theme === 'dark' ? '#ffffff' : '#1f2937', fontSize: '20px', fontWeight: 'bold' }}>
+              📝 My Notes
+            </h2>
+          </div>
 
-        {/* --- MAIN CONTENT: VÙNG HIỂN THỊ NỘI DUNG --- */}
-        <main style={{ 
-          flex: 1, 
-          padding: '20px',
-          backgroundColor: isDark ? '#1e1e1e' : '#ffffff',
-          color: isDark ? '#ffffff' : '#000000'
-        }}>
-          <Routes>
-            <Route path="/" element={<Notes theme={theme} />} />
-            <Route path="/private" element={<PrivateNotes theme={theme} />} />
-            {/* TRUYỀN PROPS THEME VÀ SETTHEME XUỐNG SETTINGS */}
-            <Route path="/settings" element={<Settings theme={theme} setTheme={setTheme} />} />
-          </Routes>
-        </main>
+          {/* Nội dung cuộn */}
+          <div style={{ 
+            flex: 1, 
+            overflowY: 'auto', 
+            padding: '16px',
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+            color: theme === 'dark' ? '#ffffff' : '#000000'
+          }}>
+            <Routes>
+              <Route path="/" element={<Notes theme={theme} />} />
+              <Route path="/private" element={<PrivateNotes theme={theme} />} />
+              <Route path="/settings" element={<Settings theme={theme} setTheme={setTheme} />} />
+            </Routes>
+          </div>
 
+          {/* Bottom Navigation Bar */}
+          <div style={{ 
+            display: 'flex', 
+            backgroundColor: theme === 'dark' ? '#111827' : '#ffffff', 
+            borderTop: '1px solid #e5e7eb',
+            boxShadow: '0 -2px 10px rgba(0,0,0,0.03)'
+          }}>
+            <NavLink to="/" style={navItemStyle}>
+              <span style={{ fontSize: '24px', marginBottom: '4px' }}>📓</span>
+              <span style={{ fontSize: '11px', fontWeight: '700' }}>Ghi chú</span>
+            </NavLink>
+            
+            <NavLink to="/private" style={navItemStyle}>
+              <span style={{ fontSize: '24px', marginBottom: '4px' }}>🔒</span>
+              <span style={{ fontSize: '11px', fontWeight: '700' }}>Riêng tư</span>
+            </NavLink>
+            
+            <NavLink to="/settings" style={navItemStyle}>
+              <span style={{ fontSize: '24px', marginBottom: '4px' }}>⚙️</span>
+              <span style={{ fontSize: '11px', fontWeight: '700' }}>Cài đặt</span>
+            </NavLink>
+          </div>
+
+        </div>
       </div>
-    </BrowserRouter>
+    </Router>
   );
 }
 
