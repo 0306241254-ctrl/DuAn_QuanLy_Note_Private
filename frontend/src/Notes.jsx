@@ -14,7 +14,7 @@ function Notes({ theme = 'light' }) {
   const [notes, setNotes] = useState([]);
   const [formData, setFormData] = useState({ id: null, title: '', content: '' });
 
-  // THÊM MỚI: State cho Tìm kiếm, Lọc ngày và Phân trang
+  // State cho Tìm kiếm, Lọc ngày và Phân trang
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -30,14 +30,10 @@ function Notes({ theme = 'light' }) {
     fetch(`http://localhost:5000/api/notes/${topic}`)
       .then(res => res.json())
       .then(data => {
-        // Fix lỗi màn hình trắng: Đảm bảo data luôn là mảng
-        setNotes(Array.isArray(data) ? data : []);
+        setNotes(data);
         setCurrentPage(1); // Reset về trang 1 mỗi khi tải lại dữ liệu
       })
-      .catch(err => {
-        console.error("Lỗi tải ghi chú:", err);
-        setNotes([]);
-      });
+      .catch(err => console.error("Lỗi tải ghi chú:", err));
   };
 
   useEffect(() => { 
@@ -80,9 +76,8 @@ function Notes({ theme = 'light' }) {
     setFormData({ id: note.id, title: note.title, content: note.content });
   };
 
-  // THÊM MỚI: Logic lọc dữ liệu và tính toán phân trang
-  const safeNotes = Array.isArray(notes) ? notes : [];
-  const filteredNotes = safeNotes.filter(note => {
+  // Logic lọc dữ liệu và tính toán phân trang
+  const filteredNotes = notes.filter(note => {
     // 1. Lọc theo từ khóa
     const matchesSearch = 
       (note.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -153,7 +148,7 @@ function Notes({ theme = 'light' }) {
         </select>
       </div>
 
-      {/* THÊM MỚI: Thanh Tìm kiếm và Lọc ngày */}
+      {/* Thanh Tìm kiếm và Lọc ngày */}
       <div style={{ ...cardStyle, marginBottom: '20px', padding: '10px' }}>
         <input
           type="text"
@@ -240,7 +235,7 @@ function Notes({ theme = 'light' }) {
         )}
       </div>
 
-      {/* 3.3. Danh sách thẻ ghi chú (Đã đổi notes.map thành currentNotes.map) */}
+      {/* 3.3. Danh sách thẻ ghi chú */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '15px' }}>
         {currentNotes.length === 0 && <p style={{ color: isDark ? '#aaa' : '#666', gridColumn: '1 / -1' }}>Không tìm thấy ghi chú nào phù hợp.</p>}
         
@@ -281,7 +276,7 @@ function Notes({ theme = 'light' }) {
         ))}
       </div>
 
-      {/* THÊM MỚI: Thanh Phân Trang */}
+      {/* Thanh Phân Trang */}
       {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
           <button 
