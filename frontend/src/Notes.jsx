@@ -14,6 +14,13 @@ function Notes({ theme = 'light' }) {
   const [notes, setNotes] = useState([]);
   const [formData, setFormData] = useState({ id: null, title: '', content: '' });
 
+  // THÊM MỚI: State cho Tìm kiếm, Lọc ngày và Phân trang
+  const [searchTerm, setSearchTerm] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const notesPerPage = 4; // Số lượng ghi chú tối đa trên 1 trang
+
   const isDark = theme === 'dark';
 
   /* ========================================================================
@@ -22,8 +29,15 @@ function Notes({ theme = 'light' }) {
   const fetchNotes = () => {
     fetch(`http://localhost:5000/api/notes/${topic}`)
       .then(res => res.json())
-      .then(data => setNotes(data))
-      .catch(err => console.error("Lỗi tải ghi chú:", err));
+      .then(data => {
+        // Fix lỗi màn hình trắng: Đảm bảo data luôn là mảng
+        setNotes(Array.isArray(data) ? data : []);
+        setCurrentPage(1); // Reset về trang 1 mỗi khi tải lại dữ liệu
+      })
+      .catch(err => {
+        console.error("Lỗi tải ghi chú:", err);
+        setNotes([]);
+      });
   };
 
   useEffect(() => { 
@@ -66,6 +80,31 @@ function Notes({ theme = 'light' }) {
     setFormData({ id: note.id, title: note.title, content: note.content });
   };
 
+  // THÊM MỚI: Logic lọc dữ liệu và tính toán phân trang
+  const safeNotes = Array.isArray(notes) ? notes : [];
+  const filteredNotes = safeNotes.filter(note => {
+    // 1. Lọc theo từ khóa
+    const matchesSearch = 
+      (note.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (note.content || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+    // 2. Lọc theo ngày tạo (nếu backend có gửi kèm createdAt)
+    let matchesDate = true;
+    if (note.createdAt) {
+      const noteDate = new Date(note.createdAt).toISOString().split('T')[0];
+      if (startDate && noteDate < startDate) matchesDate = false;
+      if (endDate && noteDate > endDate) matchesDate = false;
+    }
+
+    return matchesSearch && matchesDate;
+  });
+
+  // Tính toán dữ liệu hiển thị cho trang hiện tại
+  const indexOfLastNote = currentPage * notesPerPage;
+  const indexOfFirstNote = indexOfLastNote - notesPerPage;
+  const currentNotes = filteredNotes.slice(indexOfFirstNote, indexOfLastNote);
+  const totalPages = Math.ceil(filteredNotes.length / notesPerPage);
+
   /* ========================================================================
   VÙNG 3: RENDER GIAO DIỆN (UI/CSS)
   ======================================================================== */
@@ -95,7 +134,7 @@ function Notes({ theme = 'light' }) {
       <h2 style={{ marginTop: 0, color: isDark ? '#ffffff' : '#000000' }}>📝 Ghi chú Công khai</h2>
       
       {/* 3.1. Vùng chọn chủ đề */}
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: '15px' }}>
         <strong>Chủ đề: </strong>
         <select 
           value={topic} 
@@ -114,6 +153,45 @@ function Notes({ theme = 'light' }) {
         </select>
       </div>
 
+      {/* THÊM MỚI: Thanh Tìm kiếm và Lọc ngày */}
+      <div style={{ ...cardStyle, marginBottom: '20px', padding: '10px' }}>
+        <input
+          type="text"
+          placeholder="🔍 Tìm kiếm tiêu đề hoặc nội dung..."
+          value={searchTerm}
+          onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+          style={inputStyle}
+        />
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '14px' }}>
+          <div style={{ flex: 1 }}>
+            <span style={{ display: 'block', marginBottom: '4px' }}>Từ ngày:</span>
+            <input
+              type="date"
+              value={startDate}
+              onChange={e => { setStartDate(e.target.value); setCurrentPage(1); }}
+              style={{ ...inputStyle, marginBottom: 0 }}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <span style={{ display: 'block', marginBottom: '4px' }}>Đến ngày:</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={e => { setEndDate(e.target.value); setCurrentPage(1); }}
+              style={{ ...inputStyle, marginBottom: 0 }}
+            />
+          </div>
+          {(searchTerm || startDate || endDate) && (
+            <button 
+              onClick={() => { setSearchTerm(''); setStartDate(''); setEndDate(''); }}
+              style={{ padding: '8px', backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '22px' }}
+            >
+              ✕ Xóa lọc
+            </button>
+          )}
+        </div>
+      </div>
+          
       {/* 3.2. Form Nhập liệu */}
       <div style={{ ...cardStyle, marginBottom: '20px' }}>
         <h3 style={{ marginTop: 0, color: isDark ? '#ffffff' : '#000000' }}>
@@ -162,10 +240,11 @@ function Notes({ theme = 'light' }) {
         )}
       </div>
 
-      {/* 3.3. Danh sách thẻ ghi chú */}
+      {/* 3.3. Danh sách thẻ ghi chú (Đã đổi notes.map thành currentNotes.map) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '15px' }}>
-        {notes.length === 0 && <p style={{ color: isDark ? '#aaa' : '#666' }}>Chưa có ghi chú nào trong danh mục này.</p>}
-        {notes.map(note => (
+        {currentNotes.length === 0 && <p style={{ color: isDark ? '#aaa' : '#666', gridColumn: '1 / -1' }}>Không tìm thấy ghi chú nào phù hợp.</p>}
+        
+        {currentNotes.map(note => (
           <div key={note.id} style={cardStyle}>
             <h4 style={{ margin: '0 0 10px 0', color: isDark ? '#ffffff' : '#007bff' }}>{note.title}</h4>
             <p style={{ whiteSpace: 'pre-wrap', margin: 0, fontSize: '14px' }}>{note.content}</p>
@@ -201,6 +280,32 @@ function Notes({ theme = 'light' }) {
           </div>
         ))}
       </div>
+
+      {/* THÊM MỚI: Thanh Phân Trang */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
+          <button 
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            style={{ padding: '8px 12px', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', backgroundColor: currentPage === 1 ? '#ccc' : '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
+          >
+            Trang trước
+          </button>
+          
+          <span style={{ color: isDark ? '#fff' : '#000', fontWeight: 'bold' }}>
+            Trang {currentPage} / {totalPages}
+          </span>
+
+          <button 
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            style={{ padding: '8px 12px', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', backgroundColor: currentPage === totalPages ? '#ccc' : '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
+          >
+            Trang sau
+          </button>
+        </div>
+      )}
+
     </div>
   );
 }
